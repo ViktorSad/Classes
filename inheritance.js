@@ -8,7 +8,8 @@ instance.getAllArticals() - get an array of all articles
 
 class User {
   articles = [];
-  constructor(login, firstName, lastName, email, password) {
+  constructor(appInstance, login, firstName, lastName, email, password) {
+    this.appInstance = appInstance;
     this.login = login;
     this.firstName = firstName;
     this.lastName = lastName;
@@ -32,7 +33,7 @@ class User {
 
   getAllArticles() {
     const articles = [];
-    myApp.database.forEach(el => {
+    this.appInstance.database.forEach(el => {
       if (el.articles.length) articles.push(...el.articles);
     });
     return console.log(articles);
@@ -43,27 +44,43 @@ instrance.addAdmin(login, firstName, lastName, email, password) - adding new Adm
 
 instrance.addUser(login, firstName, lastName, email, password) - adding new user
 instrance.deleteUser(login) - deleting the user
-all еру куые  methods are inherited from the class Гыук
+instance.showUsers() - show all the users
+
 */
 
 class Admin extends User {
-  constructor(login, firstName, lastName, email, password) {
-    super(login, firstName, lastName, email, password);
+  constructor(appInstance, login, firstName, lastName, email, password) {
+    super(appInstance, login, firstName, lastName, email, password);
   }
   addUser(login, firstName, lastName, email, password) {
-    myApp.database.push(new User(login, firstName, lastName, email, password));
+    this.appInstance.database.push(
+      new User(this.appInstance, login, firstName, lastName, email, password)
+    );
   }
   addAdmin(login, firstName, lastName, email, password) {
-    myApp.database.push(new Admin(login, firstName, lastName, email, password));
+    this.appInstance.database.push(
+      new Admin(this.appInstance, login, firstName, lastName, email, password)
+    );
   }
 
   deleteUser(login) {
-    const user = myApp.database.find(el => el.login);
+    const user = this.appInstance.database.find(el => el.login);
     if (!user) return console.log('User is not exist');
-    myApp.database.splice(myApp.database.indexOf(user) - 1, 1);
+    this.appInstance.database.splice(
+      this.appInstance.database.indexOf(user) - 1,
+      1
+    );
   }
-  get showUsers() {
-    return console.log(myApp.database);
+  showUsers() {
+    console.log('Current user:');
+    this.info;
+    breaklines();
+    console.log('List of users:');
+    breaklines();
+    this.appInstance.database.forEach(el => {
+      el.info;
+      breaklines();
+    });
   }
 }
 
@@ -73,10 +90,12 @@ instance.login(login, password) - login to the app
 
 */
 class App {
-  database = [
-    new Admin('admin', 'Jhon', 'Smith', 'smith@gmail.com', 'root12345'),
-  ];
   currentUser;
+  constructor(login, firstName, lastName, email, password) {
+    this.database = [
+      new Admin(this, login, firstName, lastName, email, password),
+    ];
+  }
 
   login(login, password) {
     const result = this.database.find(
@@ -96,41 +115,83 @@ class App {
 const breaklines = () => console.log('*'.padEnd(50, '*')); // just separate the output
 
 // start
-const myApp = new App();
 
-myApp.login('admin', 'root12345'); // Login to myApp as admin
-myApp.currentUser.addAdmin(
+//////////////////////////////////////
+//  Database 1
+
+const myApp1 = new App('admin', 'Jhon', 'Smith', 'dssd@gmail.com', '123456'); // init app with new admin
+
+myApp1.login('admin', '123456'); // Login to myApp1 as admin
+myApp1.currentUser.addAdmin(
   'user123',
   'Antony',
   'Braun',
   'braun@yopop.com',
   'qwerty'
 ); // adding another admin
+//
+myApp1.currentUser.addUser(
+  'user1',
+  'Alex',
+  'De Wos',
+  'ali@icloud.com',
+  'qwerty'
+); //  Add another user
+myApp1.currentUser.addUser(
+  'user2',
+  'Olivia',
+  'Hernandez',
+  'oliv@icloud.com',
+  'olivia123'
+); //  Add another user
+myApp1.currentUser.addUser(
+  'user3',
+  'Alexander ',
+  'Taylor',
+  'alex@icloud.com',
+  'alex123'
+); //  Add another user
+myApp1.currentUser.addUser(
+  'user4',
+  'Emma ',
+  'Moore',
+  'moore@icloud.com',
+  'moore123'
+); //  Add another user
+myApp1.currentUser.addUser(
+  'user5',
+  'Benjamin',
+  'Smith',
+  'smith@icloud.com',
+  'smith123'
+); //  Add another user
+myApp1.currentUser.addUser(
+  'user6',
+  'Ava Johnson',
+  'Johnson',
+  'ava@icloud.com',
+  'qwerty'
+); //  Add another user
 
 breaklines();
-myApp.currentUser.addArticle('JS classes', ' this week'); // Adding an article
-myApp.currentUser.ownArticles; // array of own articles
+breaklines();
+myApp1.currentUser.showUsers(); // show all the users
+breaklines();
+// Adding Articles
+myApp1.currentUser.addArticle('JS', 'JS Basic 7 weeks');
+myApp1.currentUser.addArticle('HTML', 'HTML 5 days');
+myApp1.currentUser.addArticle('CSS', 'CSS 3 days');
+myApp1.currentUser.getAllArticles();
+// Switch the user
+myApp1.login('user6', 'qwerty');
+myApp1.currentUser.addArticle('Monday', 'Monday is day off');
+myApp1.currentUser.getAllArticles();
+breaklines();
 
-breaklines();
-myApp.currentUser.addArticle('Node.js', 'next week'); // Add another article
-myApp.currentUser.ownArticles; // get a list of own article
-breaklines;
-myApp.currentUser.addUser('logi', 'Alex', 'De Wos', 'ali@icloud.com', '12345'); //  Add another user
-myApp.currentUser.showUsers; // show all users
-breaklines();
-myApp.currentUser.getAllArticles(); // show all articles
-breaklines();
-myApp.login('logi', '12345'); // Log in as 'logi'
-breaklines();
-myApp.currentUser.info; // get profile of 'logi'
-breaklines();
-myApp.currentUser.getAllArticles();
-myApp.currentUser.addArticle('React', 'It takes some time');
-breaklines();
-myApp.currentUser.getAllArticles(); // get all articles
-breaklines();
-myApp.login('user123', 'qwerty');
-breaklines;
-myApp.currentUser.deleteUser('logi');
-breaklines();
-myApp.currentUser.showUsers;
+// ///////////////////////////
+//  Database 2
+const myApp2 = new App('admin', 'James', 'Miller', 'miller@gmail.com', '1351'); // init with new admin
+myApp2.login('admin', '1351'); // Login as new admin
+myApp2.currentUser.showUsers(); // show all users
+myApp2.currentUser.addArticle('Python', ' Best for backEnd'); // Add articles
+myApp2.currentUser.getAllArticles(); // show all the articals
